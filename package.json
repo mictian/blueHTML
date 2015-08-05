@@ -1,0 +1,31 @@
+{
+  "name": "blueHTML",
+  "version": "0.0.1",
+  "description": "Handlebars to Virtual DOM parser",
+  "main": "index.js",
+  "scripts": {
+    "test": "jasmine"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/mictian/blueHTML"
+  },
+  "keywords": [
+    "handlebars",
+    "virtual-dom",
+    "parser"
+  ],
+  "author": "Mictian",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mictian/blueHTML/issues"
+  },
+  "homepage": "https://github.com/mictian/blueHTML",
+  "dependencies": {
+    "underscore": "^1.8.3",
+    "virtual-dom": "^2.0.1"
+  },
+  "devDependencies": {
+    "jasmine": "^2.3.1"
+  }
+}
