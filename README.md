@@ -87,7 +87,7 @@ The big difference in the final code between Handlebars and blueHTML, is that Ha
 In other word, when you add extra helper in Handlebars you are adding them to the runner, so your helpers are evaludated in runtime.
 In blueHTML the produced code is a simple String, which means that you are responsible for the context where your extensions run. You must think that blueHTML will generate a string code, that later on will be executed.
 
-#### New context context
+#### New context creation
 One aspect that I think is really important to understand, is the concept of context.
 blueHTML is really simple, this is the only point that require understanding.
 The group of ALL valid variables to be accessed in any time are those declared in the current context.
