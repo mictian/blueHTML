@@ -1,6 +1,6 @@
 {
   "name": "bluehtml",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Handlebars to Virtual DOM parser",
   "main": "index.js",
   "scripts": {
