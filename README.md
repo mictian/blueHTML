@@ -12,19 +12,24 @@ PR Accepted (Specially Unit Tests :D )
 ## API & Samples
 
 ```javascript
-var blueHTML = require('blueHTML');
+var blueHTML = require('bluehtml')
+,   h = require('virtual-dom/h')
+,   _ = require("underscore")
 
-var handlebars_template = '<div id="content"><h1>{{title}}</h1>{{mainContent}}</div>';
-var context = {
-    title: 'Test Title',
-    mainContent: 'Hello word'
-};
 
-var virtual_dom_string_template = blueHTML.generateVirtualDOM(handlebars_template);
+var template_string = '<div id="content"><h1>{{title}}</h1>{{mainContent}}</div>'
+,   virtual_dom = blueHTML.generateVirtualDOM(template_string, {notGenerateContext:true})
+,   context = {
+        title: 'Test Title',
+        mainContent: 'Hello word'
+    };
 
-var virtual_dom_fn = eval(virtual_dom_string_template);
+console.log(virtual_dom);
 
-var dom_output = virtual_dom_fn(context);
+var eval_fn = "var ctx = " + JSON.stringify(context) + ';' + virtual_dom;
+
+var virtual_dom_output = eval(eval_fn);
+console.log(virtual_dom_output);
 
 ```
 
@@ -74,9 +79,9 @@ As the state of the code, there is basic support for extensions/custom helpers, 
 The best way to explain this is through an example:
 
 ```javascript
-var blueHTML = require('blueHTML');
+var blueHTML = require('bluehtml');
 
-var handlebars_template = '<div id="content"><h1>{{MyCustomExtension variable1 'someString'}}</h1></div>';
+var handlebars_template = '<div id="content"><h1>{{MyCustomExtension variable1 "someString"}}</h1></div>';
 
 
 blueHTML.addCustomHandler({
@@ -87,16 +92,9 @@ blueHTML.addCustomHandler({
 	}
 });
 
-var context = {
-    title: 'Test Title',
-    mainContent: 'Hello word'
-};
-
 var virtual_dom_string_template = blueHTML.generateVirtualDOM(handlebars_template);
 
-var virtual_dom_fn = eval(virtual_dom_string_template);
-
-var dom_output = virtual_dom_fn(context);
+console.log(virtual_dom_string_template)
 
 ```
 

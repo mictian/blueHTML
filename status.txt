@@ -1,0 +1,31 @@
+
+ADD SUPPORT FOR
+*	GENERIC BLOCKS
+*	ELSE in EACH block
+*	Generic tag type: <{{type}}></{{type}}>
+*	COMMENTS. In attributes and tags
+*	Handle {{this}}
+*	Fixing the entire template where there is not single tag father.
+
+
+TO CHECK
+*	Valdiate list of supported cases in both, node and attributes
+*	Spaces in block are not supported?
+*	Parameters in generic statements (single and blocks) which should be extracted from the context. These could be:
+		REFRENCE VALUES
+		LOOKUP VALUES
+		SINGLE VALUES
+*	Reference values used in:
+		IF conditions
+		UNLESS conditions
+		EVALUATION iterator
+		UNSAFEEVALUATION
+		AFEEVALUATION
+		GENERIC single
+		GENERIC block
+
+OPTIMIZATIONS
+*	IN VALUES:
+	If all its string are simples, add those values in one single set.
+	If the last value is a space ommit it
+
