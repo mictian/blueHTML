@@ -1,6 +1,7 @@
 //@module blueHTML
 var codeGenerator = require('./lib/codeGenerator')
 ,	_ = require('underscore')
+,	compositeViewPlugin = require('./defaultPlugins/compositionViews');
 
 var local_parser = new codeGenerator();
 
@@ -41,6 +42,10 @@ module.exports = {
 		deps = result.contextName + (result.externalDependencies.length > 0 ? ',' +result.externalDependenciesObjectName : '' );
 
 		return 'function ('+deps+') { return ' + result.value + ';}';
+	}
+	//@property {Object} defaultPlugins Each proprety of this object is of type Plugin
+,	defaultPlugins: {
+		'compositeViews': compositeViewPlugin
 	}
 	//@method addCustomHandler Method used to define a new custom Handlebars Helper
 	//@param {ExtenderCodeGeneratorObject} handlebars_custom_handlers
