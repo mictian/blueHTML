@@ -1,38 +1,28 @@
 //@module blueHTML
-'use strict';
+var codeGenerator = require('./lib/codeGenerator')
+,	_ = require('underscore')
 
-var attrsCodeGenerator = require('./lib/attributesCodeGenerator')
-,	nodesCodeGenerator = require('./lib/nodesCodeGenerator')
-,	_ = require('underscore');
+var local_parser = new codeGenerator();
 
-//@class Index
+//@class blueHTML
 module.exports = {
-	//@property {NodesCodeGenerator} Parser Although this is a code generator from the client of this api point of view, the name parser is ok.
-	Parser: nodesCodeGenerator
-	//@property {AttributesCodeGenerator} AttributesParser Although this is a code generator from the client of this api point of view, the name parser is ok.
-,	AttributesParser: attrsCodeGenerator
-	//@method getNewParser Creates a new instance of the code generatos by setting all require information.
-	//@return {NodesCodeGenerator} A new instance of the code generator
-,	getNewParser: function ()
-	{
-		return new nodesCodeGenerator({attributesParser: attrsCodeGenerator});
-	}
+	//@property {CodeGenerator} codeGenerator
+	codeGenerator: codeGenerator
+
 	//@method generateVirtualDOM Shortcut method to easily start converting handlebars to virtual-dom
 	//@param {String} string_html Handlebar HTML template
 	//@param {VirtualDOMGenerationOptions} options List of option to configure the parsing process
 	//@return {String} Final virtual-dom string code already wrapped in a fuctions
 ,	generateVirtualDOM: function (string_html, options)
 	{
+		'use strict';
+
 		options = _.defaults(options || {}, {
 			notGenerateContext: false
-		,	attributeParserOptions: {}
-		,	attributesParser: attrsCodeGenerator
 		});
 
-		var parser = new nodesCodeGenerator(options)
-		,	result = parser.parse(string_html)
+		var result = local_parser.parse(string_html, options)
 		,	deps = [];
-
 
 		if (result.value.indexOf('[') === 0)
 		{
@@ -45,34 +35,25 @@ module.exports = {
 
 		if (options.notGenerateContext)
 		{
-			return result;
+			return result.value;
 		}
 
-		deps = result.contextName + (result.compositeViews.length > 0 ? ',' +result.externalDependencyVariableName : '' );
+		deps = result.contextName + (result.externalDependencies.length > 0 ? ',' +result.externalDependenciesObjectName : '' );
 
 		return 'function ('+deps+') { return ' + result.value + ';}';
 	}
-	//@method addAttributesHandlers Method used to define a new custom Handlebars Helper used by the Attributes code generator
-	//@param {ExtenderCodeGeneratorObject} handlebars_attributes_handlers
+	//@method addCustomHandler Method used to define a new custom Handlebars Helper
+	//@param {ExtenderCodeGeneratorObject} handlebars_custom_handlers
 	//@return {Void}
-,	addAttributesHandlers: function (handlebars_attributes_handlers)
-	{
-		_.extend(attrsCodeGenerator.prototype, handlebars_attributes_handlers || {});
-	}
-	//@method addNodesHandlers Method used to define a new custom Handlebars Helper used by the Nodes code generator
-	//@param {ExtenderCodeGeneratorObject} handlebars_nodes_handlers
+,	addCustomHandler: local_parser.addCustomHandler
+	//@method installPlugin Install a plugin inside the code generator
+	//@param {Plugin} plugin_container
 	//@return {Void}
-,	addNodesHandlers: function (handlebars_nodes_handlers)
-	{
-		_.extend(nodesCodeGenerator.prototype, handlebars_nodes_handlers || {});
-	}
+,	installPlugin: local_parser.installPlugin
 };
 
-//@class VirtualDOMGenerationOptions @extend NodesCodeGeneratorInitializer
-//@prpoerty {Boolean} notGenerateContext Indicate if the final function wrapper must be generator or not. Default value: false (Wrapper function IS generated)
 
-
-// @class ExtenderCodeGeneratorObject Object used to extend any of the code generators, Attributes code generator or Node code generator.
+// @class ExtenderCodeGeneratorObject Object used to extend any of the code generators.
 //  In this object each property must be a function. Two kind of functions are supported:
 // *   **Extension Functions**: These are functions that will take the parameters from the Code generator and output a string code.
 //         This can be seen as a point to extend the code generator it self.
@@ -80,7 +61,7 @@ module.exports = {
 //         Sample:
 //     ```javascript
 //     var blueHTML = require('blueHTML');
-//     blueHTML.addNodesHandlers({
+//     blueHTML.addCustomHandler({
 //         'singleTranslate': function (parsing_context, is_inside_context)
 //         {
 //             return 'h("div",[])';
@@ -109,7 +90,7 @@ module.exports = {
 //     Sample:
 //     ```javascript
 //     var blueHTML = require('blueHTML');
-//     blueHTML.addNodesHandlers({
+//     blueHTML.addCustomHandler({
 //         'singleInstanceTranslate': function (string_key_to_translate)
 //         {
 //             return 'key not found :(';
@@ -126,7 +107,7 @@ module.exports = {
 
 // **Important Note:**
 // 1.   As you can guess, this functions are prefixed with the word *single* as their aim is to handle single helpers. In order word, by the time being **generic block are not supported!!**
-// 2.  The examples here shows how to extend the Node generator, but exactly the same restriction and options apply for the Attribute code generator.
+// 2.  The examples here applies to both Attributes and Tags
 
 
 
