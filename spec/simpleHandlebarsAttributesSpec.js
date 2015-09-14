@@ -382,21 +382,30 @@ describe('Simple Handlebars Attributes', function ()
 			});
 		});
 
-		//TODO Implement this
-		xdescribe('Safe reference evaluation', function ()
+		describe('Safe reference evaluation', function ()
 		{
-			it('Should recognize a simple reference evaluation', function ()
+			it('Should throw an error on a simple reference evaluation without a valid context', function ()
 			{
-				var result = parse('<input {{@index}}>')
-				,	expeted = 'wrong';
+				expect(function () {return parse('<input data-index="{{@index}}">')}).toThrowError('Invalid safe reference evaluation.');
+			});
 
-				expect(result).toEqual(expeted);
+			it('Should throw an error on a simple reference evaluation with dots without a valid context', function ()
+			{
+				expect(function () {return parse('<div data-value=\'{{@evaluate.Me.again}}\'></div>')}).toThrowError('Invalid safe reference evaluation.');
 			});
 
 			it('Should recognize a simple reference evaluation with dots', function ()
 			{
-				var result = parse('<div {{@evaluate.Me.again}}></div>')
-				,	expeted = 'wrong';
+				var result = parse('<div> {{#each collection}} <input value="{{ @index  }}"/> {{/each}}</div>')
+				,	expeted = h("div",{},(function () {var children=[];
+								children=children.concat(_.reduce( ctx.collection, function (eachAccumulator2,eachIterator1,eachIterator1Index) {
+									var contextName3= {eachIterator1:eachIterator1,first:eachIterator1Index === 0,last:eachIterator1Index === (ctx.collection.length - 1),index:eachIterator1Index,indexPlusOne:eachIterator1Index+1};
+									eachAccumulator2=eachAccumulator2.concat((function () {
+										var children=[];children=children.concat([h("input",(function (){var obj = {}; obj["value"]="";
+											obj["value"]+= _.escape(contextName3.index);return {attributes: obj};})(),[])]);
+										return children; })());
+									return eachAccumulator2}, []));
+								return children; })());
 
 				expect(result).toEqual(expeted);
 			});
@@ -427,29 +436,46 @@ describe('Simple Handlebars Attributes', function ()
 			});
 		});
 
-		//TODO Implement this
-		xdescribe('Unsafe reference evaluation', function ()
+		describe('Unsafe reference evaluation', function ()
 		{
-			it('Should recognize a simple unsafe reference evaluation', function ()
+			it('Should throw an error on a simple reference evaluation without a valid context', function ()
 			{
-				var result = parse('<div {{{@index}}}></div>')
-				,	expeted = 'wrong';
+				expect(function () {return parse('<input data-index="{{{@index}}}">')}).toThrowError('Invalid unsafe reference evaluation.');
+			});
+
+			it('Should throw an error on a simple reference evaluation with dots without a valid context', function ()
+			{
+				expect(function () {return parse('<div data-value=\'{{{@evaluate.Me.again}}}\'></div>')}).toThrowError('Invalid unsafe reference evaluation.');
+			});
+
+			it('Should recognize a simple reference evaluation with dots as attribute value', function ()
+			{
+				var result = parse('<div> {{#each collection}} <input value="{{{ @index  }}}"/> {{/each}}</div>')
+				,	expeted = h("div",{},(function () {var children=[];
+								children=children.concat(_.reduce( ctx.collection, function (eachAccumulator2,eachIterator1,eachIterator1Index) {
+									var contextName3= {eachIterator1:eachIterator1,first:eachIterator1Index === 0,last:eachIterator1Index === (ctx.collection.length - 1),index:eachIterator1Index,indexPlusOne:eachIterator1Index+1};
+									eachAccumulator2=eachAccumulator2.concat((function () {
+										var children=[];children=children.concat([h("input",(function (){var obj = {}; obj["value"]="";
+											obj["value"]+= contextName3.index;return {attributes: obj};})(),[])]);
+										return children; })());
+									return eachAccumulator2}, []));
+								return children; })());
 
 				expect(result).toEqual(expeted);
 			});
 
-			it('Should recognize a simple unsafe reference evaluation with spaces', function ()
+			it('Should recognize a simple reference evaluation with dots as attribute name', function ()
 			{
-				var result = parse('<input {{{ @index  }}}/>')
-				,	expeted = 'wrong';
-
-				expect(result).toEqual(expeted);
-			});
-
-			it('Should recognize a simple unsafe reference evaluation with dots', function ()
-			{
-				var result = parse('<input {{{@evaluate.Me.again}}}>')
-				,	expeted = 'wrong';
+				var result = parse('<div> {{#each collection}} <input {{ @index  }}/> {{/each}}</div>')
+				,	expeted = h("div",{},(function () {var children=[];
+								children=children.concat(_.reduce( ctx.collection, function (eachAccumulator2,eachIterator1,eachIterator1Index) {
+									var contextName3= {eachIterator1:eachIterator1,first:eachIterator1Index === 0,last:eachIterator1Index === (ctx.collection.length - 1),index:eachIterator1Index,indexPlusOne:eachIterator1Index+1};
+									eachAccumulator2=eachAccumulator2.concat((function () {
+										var children=[];children=children.concat([h("input",(function (){var obj = {};
+											obj[ _.escape(contextName3.index)]="";
+											return {attributes: obj};})(),[])]);
+										return children; })());
+									return eachAccumulator2}, []));return children; })());
 
 				expect(result).toEqual(expeted);
 			});
@@ -460,7 +486,7 @@ describe('Simple Handlebars Attributes', function ()
 			it('Should recognize a simple look up expression', function ()
 			{
 				var result = parse('<article{{../parent}} ></article>')
-				,	expeted = h("article",(function (){var obj = {}; obj["ctx.parent"]="";return {attributes: obj};})(),[]);
+				,	expeted = h("article",(function (){var obj = {}; obj[_.escape(ctx.parent)]="";return {attributes: obj};})(),[]);
 
 				expect(result).toEqual(expeted);
 			});
@@ -468,7 +494,7 @@ describe('Simple Handlebars Attributes', function ()
 			it('Should recognize a look up expression of many levels', function ()
 			{
 				var result = parse('<span {{../../../parent}}></span>')
-				,	expeted = h("span",(function (){var obj = {}; obj["ctx.parent"]="";return {attributes: obj};})(),[]);
+				,	expeted = h("span",(function (){var obj = {}; obj[_.escape(ctx.parent)]="";return {attributes: obj};})(),[]);
 
 				expect(result).toEqual(expeted);
 			});

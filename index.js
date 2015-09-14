@@ -1,52 +1,46 @@
 //@module blueHTML
 var codeGenerator = require('./lib/codeGenerator')
 ,	_ = require('underscore')
+,	virtualDOMAdapter = require('./lib/Adapters/virtualDOMAdapter')
+,	reactAdapter = require('./lib/Adapters/reactAdapter')
 ,	compositeViewPlugin = require('./defaultPlugins/compositionViews');
 
-var local_parser = new codeGenerator();
+var local_parser = new codeGenerator()
+,	defaultsAdapters =  {
+		'VD':  virtualDOMAdapter
+	,	'R': reactAdapter
+	};
 
 //@class blueHTML
 module.exports = {
 	//@property {CodeGenerator} codeGenerator
 	codeGenerator: codeGenerator
 
-	//@method generateVirtualDOM Shortcut method to easily start converting handlebars to virtual-dom
+	//@method generateVirtualDOM Shortcut method to easily start converting handlebarsX to virtual-dom
 	//@param {String} string_html Handlebar HTML template
 	//@param {VirtualDOMGenerationOptions} options List of option to configure the parsing process
-	//@return {String} Final virtual-dom string code already wrapped in a fuctions
+	//@return {String} Final virtual-dom string code already wrapped in a functions
 ,	generateVirtualDOM: function (string_html, options)
 	{
 		'use strict';
 
 		options = _.defaults(options || {}, {
 			notGenerateContext: false
+		,	adapterName: 'VD'
 		});
 
-		var result = local_parser.parse(string_html, options)
-		,	deps = [];
+		options.adapter = options.adapter || defaultsAdapters[options.adapterName];
 
-		if (result.value.indexOf('[') === 0)
-		{
-			result.value = result.value.substr(1);
-		}
-		if (result.value.indexOf(']', result.value.length - 1) !== -1)
-		{
-			result.value = result.value.substr(0, result.value.length -1);
-		}
+		var result = local_parser.generateCode(string_html, options);
 
-		if (options.notGenerateContext)
-		{
-			return result.value;
-		}
-
-		deps = result.contextName + (result.externalDependencies.length > 0 ? ',' +result.externalDependenciesObjectName : '' );
-
-		return 'function ('+deps+') { return ' + result.value + ';}';
+		return result.value;
 	}
-	//@property {Object} defaultPlugins Each proprety of this object is of type Plugin
+	//@property {Object} defaultPlugins Each property of this object is of type Plugin
 ,	defaultPlugins: {
 		'compositeViews': compositeViewPlugin
 	}
+	//@property {Object} defaultsAdapters   Each property of this object is of type Adapter
+,	defaultsAdapters: defaultsAdapters
 	//@method addCustomHandler Method used to define a new custom Handlebars Helper
 	//@param {ExtenderCodeGeneratorObject} handlebars_custom_handlers
 	//@return {Void}
@@ -59,10 +53,10 @@ module.exports = {
 
 
 // @class ExtenderCodeGeneratorObject Object used to extend any of the code generators.
-//  In this object each property must be a function. Two kind of functions are supported:
-// *   **Extension Functions**: These are functions that will take the parameters from the Code generator and output a string code.
+// In this object each property must be a function. Two kind of functions are supported:
+// * 	**Extension Functions**: These are functions that will take the parameters from the Code generator and output a string code.
 //         This can be seen as a point to extend the code generator it self.
-//         This functions are distinguish by the property name they are atteched to. In this case the name MUST start with the word 'single' and MUST NOT be 'singleInstance'
+//         This functions are distinguish by the property name they are attached to. In this case the name MUST start with the word 'single' and MUST NOT be 'singleInstance'
 //         Sample:
 //     ```javascript
 //     var blueHTML = require('blueHTML');
@@ -113,10 +107,4 @@ module.exports = {
 // **Important Note:**
 // 1.   As you can guess, this functions are prefixed with the word *single* as their aim is to handle single helpers. In order word, by the time being **generic block are not supported!!**
 // 2.  The examples here applies to both Attributes and Tags
-
-
-
-
-
-
 

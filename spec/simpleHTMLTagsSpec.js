@@ -16,7 +16,7 @@ parser.parse = function (template_str, return_string, options)
 
 describe('Simple HTLM', function ()
 {
-	describe('block nodes', function ()
+	describe('block tags', function ()
 	{
 		it('Should recognize simple block elements (div)', function ()
 		{
@@ -29,7 +29,7 @@ describe('Simple HTLM', function ()
 		it('Should recognize simples block elements (div) together', function ()
 		{
 			//IMPORTANT: Notice that here the comparison is made using string as the evaluation will only take into account the first
-			//div. For this reason is that more than one root node is discouraged
+			//div. For this reason is that more than one root tag is discouraged
 			var result = parser.parse('<div></div><div></div>', true, {allowMultiplesFathers: true})
 			,	expeted = 'h("div",{},[]),h("div",{},[])';
 
@@ -69,7 +69,7 @@ describe('Simple HTLM', function ()
 		});
 	});
 
-	describe('single nodes', function ()
+	describe('single tags', function ()
 	{
 		it('Should recognize simple single elements (input)', function ()
 		{
@@ -97,24 +97,24 @@ describe('Simple HTLM', function ()
 
 		it('Should recognize simple text', function ()
 		{
-			var result = parser.parse('This is a text node')
-			,	expeted = "This is a text node";
+			var result = parser.parse('This is a text tag')
+			,	expeted = "This is a text tag";
 
 			expect(result).toEqual(expeted);
 		});
 
-		it('Should recognize simple text nested in block nodes', function ()
+		it('Should recognize simple text nested in block tags', function ()
 		{
-			var result = parser.parse('<div>This is a text node</div>')
-			,	expeted = h("div",{},(function () {children= [];children=children.concat(["This is a text node"]);return children; })());
+			var result = parser.parse('<div>This is a text tag</div>')
+			,	expeted = h("div",{},(function () {children= [];children=children.concat(["This is a text tag"]);return children; })());
 
 			expect(result).toEqual(expeted);
 		});
 
-		it('Should recognize simple text nested in block nodes with a single node in-line', function ()
+		it('Should recognize simple text nested in block tags with a single tag in-line', function ()
 		{
-			var result = parser.parse('<div>This is a text node<hr/></div>')
-			,	expeted = h("div",{},(function () {children= [];children=children.concat(["This is a text node"]);children=children.concat([h("hr",{},[])]);return children; })());
+			var result = parser.parse('<div>This is a text tag<hr/></div>')
+			,	expeted = h("div",{},(function () {children= [];children=children.concat(["This is a text tag"]);children=children.concat([h("hr",{},[])]);return children; })());
 
 			expect(result).toEqual(expeted);
 		});
@@ -139,7 +139,7 @@ describe('Simple HTLM', function ()
 				expect(result).toEqual(expeted);
 			});
 
-			it('Should recognize nested html comments in block nodes', function ()
+			it('Should recognize nested html comments in block tags', function ()
 			{
 				var result = parser.parse('<span> <!-- This is a comment --> </span>')
 				,	expeted = [{"type":"htmlBlockNode","openTag":"span","closeTag":"span","attributes":[],"children":[{"type":"htmlComment","value":" This is a comment "}]}];

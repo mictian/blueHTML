@@ -443,29 +443,30 @@ describe('Handlebars nodes', function ()
 			});
 		});
 
-		//TODO IMPLEMENT THIS!
-		xdescribe('Safe reference evaluation', function ()
+		describe('Safe reference evaluation', function ()
 		{
-			it('Should recognize a simple reference evaluation', function ()
+			it('Should throw an error on a simple reference evaluation without a valid context', function ()
 			{
-				var result = parse('<div>{{@index}}</div>')
-				,	expeted = 'wrong';
-
-				expect(result).toEqual(expeted);
+				expect(function () {return parse('<input> {{@index}} </input>')}).toThrowError('Invalid safe reference evaluation.');
 			});
 
-			it('Should recognize a simple reference evaluation with spaces', function ()
+			it('Should throw an error on a simple reference evaluation with dots without a valid context', function ()
 			{
-				var result = parse('{{ @index  }}')
-				,	expeted = 'wrong';
-
-				expect(result).toEqual(expeted);
+				expect(function () {return parse('<div> {{@evaluate.Me.again}}</div>')}).toThrowError('Invalid safe reference evaluation.');
 			});
 
 			it('Should recognize a simple reference evaluation with dots', function ()
 			{
-				var result = parse('{{@evaluate.Me.again}}')
-				,	expeted = 'wrong';
+				var result = parse('<div> {{#each collection}} {{ @index  }} {{/each}}</div>')
+				,	expeted = h("div",{},(function () {var children=[];
+								children=children.concat(_.reduce( ctx.collection, function (eachAccumulator2,eachIterator1,eachIterator1Index) {
+									var contextName3= {eachIterator1:eachIterator1,first:eachIterator1Index === 0,last:eachIterator1Index === (ctx.collection.length - 1),index:eachIterator1Index,indexPlusOne:eachIterator1Index+1};
+									eachAccumulator2=eachAccumulator2.concat((function () {
+										var children=[];children=children.concat([h("input",(function (){var obj = {};
+											obj[ _.escape(contextName3.index)]="";
+											return {attributes: obj};})(),[])]);
+										return children; })());
+									return eachAccumulator2}, []));return children; })());
 
 				expect(result).toEqual(expeted);
 			});

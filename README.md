@@ -33,71 +33,34 @@ console.log(virtual_dom_output);
 
 ```
 
-## How blueHTML works
-The general structure of blueHTML is very simple. It is divided in 2 main sections; parsing and code generation.
-For the parsgin part [handlebars-ex](https://github.com/Mictian/handlebars-ex) is uded.
-It is important to notice that, although it is not the aim of this project, blueHTML end it up being another implementation of Handlebars, as it is require to support the same handlebars API to correctly convert it to Virtual-DOM.
+## Motivation
+I personally believe in the one-way data-flow pattern is an excellent way to model user interaction
+and I think that from an architectural point of view it has a lot of advantages.
 
-Also take a look at the Code Generation section below to understand some of the difference between Handlebars and blueHTML.
+Besides, all the great development that have been done with Virtual DOM
+technologies is something that cannot be ignored. Perhaps you can like it not,
+but for a performance point of view I think that React have leave it crystal clear.
 
+Although all the previous, I do not want to re-write all my Handlebars templates
+to JavaScript (JSX, HyperScript or whatever flavor you want) nor I think that designers should start
+writing JavaScript instead of HTML templates.
+All this VirtualDOM technologies are great, but this does not mean that we must change the way
+we have been working on, by the contrary, we can enhance the way we used to work.
+Take for instance a Backbone.js application with Handlebars (the way I work), in this case Handlebars is not used
+as a final representation of the HTML, but rather as a friendly way the designer can work with it.
+You will process your Handlebars template obtaining an output, point at which you
+will neither use this output as a final representation, and wrap it with jQuery or any other equivalent.
 
-### Code generation
-For the code generation, the process is very simple. Based on the AST a JSON object, returned by the parsed, it is just a matter of traversal it.
-The big difference in the final code between Handlebars and blueHTML, is that Handlebars has a Run Time code runner.
-In other word, when you add extra helper in Handlebars you are adding them to the runner, so your helpers are evaluated in run-time.
-In blueHTML the produced code is a simple String, which means that you are responsible for the context where your extensions run. You must think that blueHTML will generate a string code, that later on will be executed.
+So, my point is that we can use any other intermediate representation for our templates,
+jQuery, VirtualDOM or the one you think is better, as long as we keep a clear separation
+between what the aim of each part is.
 
-#### New context creation
-One aspect that I think is really important to understand, is the concept of context.
-blueHTML is really simple, this is the only point that require understanding.
-The group of ALL valid variables to be accessed in any time are those declared in the current context.
-By default (or at the being of your template) blueHTML presume that a generic context (ctx) exists and you can use any variable name. After this, there are two Handlebars helpers that define new context, EACH and WITH, currently only EACH is supported (see the Wiki for a list of supported features and it's status).
-When a new context is created all variables are read from it.
-
-In code: the expression
-
-```javascript
-{{variableName}}
-```
-when a new context is create will be retrieve from the new context.
-
-Besides, all reference value (in the blueHTML jargon all handlebars expression that start with @) must be declare in the context.
-
-For example:
-
-```html
-{{#each iterator}}
-<div>{{@index}}</div>
-{{/each}}
-```
-In this case index MUST be defined in the new context created by EACH.
-Relax, blueHTML create the default Handlebars values for you, and also you can extend this :D.
+##Documentation
+For a general overview please refer to the [Wiki](https://github.com/Mictian/blueHTML/wiki/General-Documentation) and more technical one please refer to the code which is fully documented.
 
 
-## Custom Helpers
-As the state of the code, there is basic support for extensions/custom helpers, neither all ways of customization provided by Handlebars are supported.
-The best way to explain this is through an example:
-
-```javascript
-var blueHTML = require('bluehtml');
-
-var handlebars_template = '<div id="content"><h1>{{MyCustomExtension variable1 "someString"}}</h1></div>';
-
-
-blueHTML.addCustomHandler({
-    // As you can see the pattern is singleInstance + <Helper name>
-	'singleInstanceMyCustomExtension': function (variable1, text)
-	{
-		return variable1 + text + '!';
-	}
-});
-
-var virtual_dom_string_template = blueHTML.generateVirtualDOM(handlebars_template);
-
-console.log(virtual_dom_string_template)
-
-```
-
+##Changelog
+(add link)
 
 # License
 The MIT License (MIT)

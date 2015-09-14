@@ -142,16 +142,33 @@ module.exports = {
 			var self = this.pluginCompositeViewsContext;
 
 			var invokable_fn = code_generation_context.externalDependenciesObjectName+'['+code_generation_context.astNode.value+']'
-			,	string_virtual_dom = '(function (){ '+
-				'if (_.isFunction('+invokable_fn+')) { return '+invokable_fn+'('+self.lastAttributesResult+'); }' +
-				'return []; })()';
+			,	output_code = ''
+			,	generate_virtualdom = !!(code_generation_context.adapter && code_generation_context.adapter.name === 'VD')
+			,	generate_react = !!(code_generation_context.adapter && code_generation_context.adapter.name === 'R');
+
+			if (generate_virtualdom)
+			{
+				output_code = '(function (){ '+
+					'if (_.isFunction('+invokable_fn+')) { return '+invokable_fn+'('+self.lastAttributesResult+'); }' +
+					'return []; })()';
+			}
+			else if (generate_react)
+			{
+				output_code = '(function (){ '+
+					'if (_.isFunction('+invokable_fn+')) { return React.createElement('+invokable_fn+'('+self.lastAttributesResult+'),null); }' +
+					'return []; })()';
+			}
+			else
+			{
+				throw new Error('Composite Views Plugin is being used with an adapter that is not supported. Only VirtualDOM and React are supported by this plugin');
+			}
 
 			if (code_generation_context.isInsideContext)
 			{
-				return code_generation_context.variableName + '=' + code_generation_context.variableName + '.concat('+string_virtual_dom+');';
+				return code_generation_context.variableName + '=' + code_generation_context.variableName + '.concat('+output_code+');';
 			}
 
-			return string_virtual_dom;
+			return output_code;
 		}
 	}
 };

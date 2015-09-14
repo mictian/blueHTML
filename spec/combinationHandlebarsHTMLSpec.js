@@ -1,8 +1,22 @@
-var parser = require('../index');
+var parser = require('../index')
+,	h = require('virtual-dom/h')
+,	_ = require('underscore')
+,	deafult_parsing_options = {
+		notGenerateContext: true
+	}
+	//GLOBAL CONTEXT!
+,	ctx = {};
+
+function parse (template_str, return_string, options)
+{
+	var vd_str = parser.generateVirtualDOM(template_str, _.extend({}, deafult_parsing_options, options));
+
+	return return_string ? vd_str : eval(vd_str);
+}
 
 xdescribe('Combination Handlebars & HTML', function ()
 {
-	it ('Should recognize a simple address template', function ()
+	xit ('Should recognize a simple address template', function ()
 	{
 		var result = parser.parse(
 				'<span class="address-container-line"> \
@@ -23,6 +37,31 @@ xdescribe('Combination Handlebars & HTML', function ()
 		expect(result).toEqual(expeted);
 	});
 
+	xdescribe('Reference Values', function ()
+	{
+		describe('Inside an invalid context', function ()
+		{
+			xit('Should fails setting a reference values as an attribute', function ()
+			{
+				var result = parse('<div {{@first}}="controller"></div>')
+				,	expeted = h("div",(function (){var obj = {}; obj["data-type"]="";obj["data-type"]+="controller";return {attributes: obj};})(),[]);
+
+				expect(result).toEqual(expeted);
+			});
+		});
+
+		describe('Inside a Valid context', function ()
+		{
+			it('Should create a property which name is the the refence values when used in attributes definitions', function ()
+			{
+				var result = parse('{{#each list}} <div {{@first}}="controller"></div> {{/each}}', true)
+				 ,	expeted = 12// h("div",(function (){var obj = {}; obj["data-type"]="";obj["data-type"]+="controller";return {attributes: obj};})(),[]);
+
+				expect(result).toEqual(expeted);
+			});
+		});
+
+	});
 
 	//REFENCE VALUES
 	//Inside an invalid context (without context at all)
