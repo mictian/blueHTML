@@ -1,6 +1,6 @@
 #Changelog
 
-##Version 0.1.0 (-09-2015)
+##Version 0.1.0 (14-09-2015)
 * Added Adapters
 * Added basic React adapter
 * Generated first iteration of out-generated-documentation
