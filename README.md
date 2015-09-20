@@ -55,12 +55,15 @@ So, my point is that we can use any other intermediate representation for our te
 jQuery, VirtualDOM or the one you think is better, as long as we keep a clear separation
 between what the aim of each part is.
 
-##Documentation
+## Documentation
 For a general overview please refer to the [Wiki](https://github.com/Mictian/blueHTML/wiki/General-Documentation) and more technical one please refer to the code which is fully documented.
 
 
-##Changelog
-(add link)
+## Changelog
+Go [Here](https://github.com/Mictian/blueHTML/blob/master/Changelog.md) to see the list of changes.
+
+# Contributors
+* juansilva (https://github.com/juansilva)
 
 # License
 The MIT License (MIT)
